@@ -1,0 +1,98 @@
+html {
+  background: #f0f0f0;
+}
+
+body {
+  width: 520px;
+  margin: 0 auto;
+  background: #fff;
+  color: #222;
+  font: 14px/1.6 "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+}
+
+#links,
+#meta {
+  list-style-type: none;
+  margin: 0;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#links li,
+#meta li {
+  display: inline-block;
+  margin: 0 0.3em 0 0;
+}
+
+#links > li:after,
+#meta > li:after {
+  content: "|";
+  color: #cacaca;
+  display: inline-block;
+  margin: 0 0 0 0.33em;
+}
+#links li:last-child:after,
+#meta li:last-child:after {
+  content: "";
+}
+
+#meta {
+  border-top: 1px solid #f0f0f0;
+  border-bottom: none;
+}
+
+#meta li.version {
+  position: relative;
+}
+
+#meta li.version em {
+  font-style: normal;
+  color: #919191;
+}
+
+#meta li.version ul {
+  display: none;
+  position: absolute;
+  width: 120px;
+  top: 1.6em;
+  left: 0;
+  background: #fff;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#meta li.version ul li {
+  margin: 0;
+  padding: 5px 12px;
+  display: block;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#meta li.version ul li a {
+  display: block;
+}
+
+#meta li.version:hover ul {
+  display: block;
+}
+
+#message {
+  margin: 0;
+  padding: 10px 20px;
+  background: #fffdde;
+}
+
+#message.error {
+  background: #ffdfdb;
+}
+
+#message p {
+  margin: 0;
+}
+
+#content {
+  margin: 20px;
+}
+
+/* =Content */

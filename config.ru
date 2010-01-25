@@ -1,0 +1,2 @@
+require 'hickey'
+run Hickey
