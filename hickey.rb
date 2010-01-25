@@ -190,7 +190,7 @@ class Hickey < Sinatra::Base
       possible_past_version = Page.first_for_slug(slug)
       redirect(possible_past_version ? "#{possible_past_version.slug}" : "/")
     else
-      message "Couldn't delete the vesion.", :error
+      message "Couldn't delete.", :error
       generate_problems
       haml :edit
     end
