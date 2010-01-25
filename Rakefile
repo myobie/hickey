@@ -6,8 +6,7 @@ namespace :db do
   end
   
   desc "Prepare the db after deploying a new app"
-  task :prepare do
-    invoke("db:migrate")
+  task :prepare => :migrate do
     require "hickey"
     p = Page.new :slug => "/", :title => "Homepage", :body => "Welcome to your new wiki."
     p.skip_math_problem!

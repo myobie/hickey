@@ -1,3 +1,2 @@
 * Full text search (should be easy with postgres)
 * Maybe beef up the spam protections without making it more inconvenient
-* Create homepage in auto migrate rake task
