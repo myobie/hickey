@@ -55,7 +55,7 @@ body {
   position: absolute;
   width: 120px;
   top: 1.6em;
-  left: 0;
+  left: -9px;
   background: #fff;
   list-style-type: none;
   margin: 0;

@@ -3,8 +3,8 @@ require 'dm-core'
 require 'dm-timestamps'
 require 'rdiscount'
 
-DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`}/Desktop/wiki.db")
+DataMapper::Logger.new(STDOUT, :debug) # :off, :fatal, :error, :warn, :info, :debug
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.strip}/Desktop/wiki.db")
 
 class Page
   include DataMapper::Resource
@@ -65,7 +65,7 @@ class Hickey < Sinatra::Base
   end
   
   get "/pages" do
-    @pages = repository.adapter.select("SELECT id, slug, title, version FROM pages ORDER BY version DESC")
+    @pages = repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY version DESC")
     haml :pages
   end
   
