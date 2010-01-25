@@ -24,7 +24,8 @@ Look at .gems to see what gems it uses.
 Install
 -------
 
-* Checkout
+* Clone
+* Create a postgres db called hickey (or pass in DATABASE_URL)
 * Boot up with shotgun `shotgun config.ru`
 
 Deploy
@@ -38,7 +39,8 @@ Deploy
 Problems
 --------
 
-Postgres only for now. Hard coded SQL in the Page model.
+* Postgres only for now. 
+* Hard coded SQL in the Page model.
 
 Credit
 ------

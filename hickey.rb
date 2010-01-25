@@ -12,7 +12,7 @@ require 'rdiscount'
 require 'digest/sha1'
 
 DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.strip}/Desktop/wiki.db")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://localhost/hickey")
 
 class Page
   include DataMapper::Resource
