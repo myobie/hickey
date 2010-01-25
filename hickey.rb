@@ -65,7 +65,8 @@ class Hickey < Sinatra::Base
   end
   
   get "/pages" do
-    @pages = repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY version DESC")
+    # ATTENTION: this will only work with postgres (sorry)
+    @pages = repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY slug ASC, version DESC")
     haml :pages
   end
   
