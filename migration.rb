@@ -10,7 +10,7 @@ migration(1, :create_pages) do
       column :body, DataMapper::Types::Text
       column :rendered_body, DataMapper::Types::Text
       column :version, Integer, :default => 0, :index => true
-      column :editor_name, String, :length => 255, :default => "Nobody"
+      column :editor_name, String, :length => 255, :default => "nobody"
       column :editor_ip, String
       column :created_at, DateTime
     end

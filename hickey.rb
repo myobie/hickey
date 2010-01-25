@@ -27,7 +27,7 @@ class Page
   property :body, Text
   property :rendered_body, Text
   property :version, Integer, :default => 0, :index => true
-  property :editor_name, String, :length => 255, :default => "Nobody"
+  property :editor_name, String, :length => 255, :default => "nobody"
   property :editor_ip, String
   property :created_at, DateTime
   
