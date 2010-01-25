@@ -254,7 +254,7 @@ __END__
     %p.human-test
       %label(for="page_math_answer")= "What is #{@problem.first} #{@problem.operator} #{@problem.second}?"
       %input(type="hidden" name="page[math_problem]" value="#{@problem.id}")
-      %input(type="text" id="page[math_test_answer]" name="page[math_answer]")
+      %input(type="text" id="page_math_answer" name="page[math_answer]")
     
     %p
       %button(type="submit") Create new version
