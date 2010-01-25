@@ -1,7 +1,9 @@
 $(function() {
   
   if (ip_parts) {
-    $("#edit-form, #delete-form").append('<input type="hidden" name="'+ip_parts[0]+'" value="'+ip_parts[1]+'">');
+    $("#edit-form, #delete-form").
+      append('<input type="hidden" name="ip_first" value="'+ip_parts[0]+'">').
+      append('<input type="hidden" name="ip_last" value="'+ip_parts[1]+'">');
   }
   
   $("#delete-form").submit(function() {

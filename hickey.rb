@@ -131,7 +131,7 @@ class Hickey < Sinatra::Base
   end
   
   def must_have_ip_parts!
-    if params[ip_parts.first] != ip_parts.last
+    if params[:ip_first] != ip_parts.first && params[:ip_last] != ip_parts.last
       throw :halt, [500, "Problem."]
     end
   end
