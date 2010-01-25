@@ -126,8 +126,17 @@ class Hickey < Sinatra::Base
     @message_type = type
   end
   
+  # to work around a bug at heroku
+  def request_ip
+    if addr = @env['HTTP_X_FORWARDED_FOR']
+      addr.split(',').first.strip # the first shall be last
+    else
+      @env['REMOTE_ADDR']
+    end
+  end
+  
   def ip_parts
-    @ip_parts ||= Digest::SHA1.hexdigest(request.ip + "lkjsdf8*&^kjdsI23").scan(/.{20}/)
+    @ip_parts ||= Digest::SHA1.hexdigest(request_ip + "lkjsdf8*&^kjdsI23").scan(/.{20}/)
   end
   
   def must_have_ip_parts!
@@ -169,7 +178,7 @@ class Hickey < Sinatra::Base
     must_have_ip_parts!
     
     @page = Page.new params[:page]
-    @page.editor_ip = request.ip
+    @page.editor_ip = request_ip
     
     if @page.save
       redirect @page.slug
