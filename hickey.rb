@@ -101,11 +101,12 @@ class Hickey < Sinatra::Base
   
   delete "/pages/:id" do
     @page = Page.get(params[:id])
+    slug = @page.slug
     @page.destroy
     
-    possible_past_version = Post.first_for_slug(@page.slug)
+    possible_past_version = Page.first_for_slug(slug)
     
-    redirect(possible_past_version ? "/#{possible_past_version.slug}" : "/")
+    redirect(possible_past_version ? "#{possible_past_version.slug}" : "/")
   end
   
   get "*" do
@@ -203,10 +204,11 @@ __END__
     %p
       %button(type="submit") Create new version
   
-  %hr
+  %hr.delete
   
   %form#delete-form(action="/pages/#{@page.id}" method="post")
     %input(type="hidden" name="_method" value="delete")
     
     %p
       %button(type="submit") Delete this version
+      %span This could be a bad idea, think about it.

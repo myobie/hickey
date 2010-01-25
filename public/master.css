@@ -91,6 +91,42 @@ body {
   margin: 0;
 }
 
+/* =Form */
+
+#edit-form label {
+  display: block;
+}
+
+#edit-form input[type="text"] {
+  width:60%;
+}
+
+#edit-form textarea {
+  width: 99%;
+  height: 30em;
+  font: 12px/1.4 "Courier New", Courier, mono;
+}
+
+hr.delete {
+  display: none;
+}
+
+#delete-form {
+  margin: 2em -10px 0;
+  background: #ffdfdb;
+  padding: 10px;
+}
+
+#delete-form p {
+  margin: 0;
+  color: #fe3e3e;
+  font-size: 12px;
+}
+
+#delete-form p span {
+  margin-left: 1em;
+}
+
 #content {
   margin: 20px;
 }
