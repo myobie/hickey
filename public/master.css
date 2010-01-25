@@ -99,13 +99,15 @@ p {
   margin: 0;
 }
 
-#pages {
+#pages,
+#search {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-#pages li {
+#pages li,
+#search li {
   display: block;
   margin: 0 0 5px;
   font-size: 16px;
