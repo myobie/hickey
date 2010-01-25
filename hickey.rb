@@ -345,7 +345,7 @@ __END__
     
     %p
       %label(for="page_editor_name") Your name:
-      %input(type="text" id="page_editor_name" name="page[editor_name]" maxlength="100")
+      %input(type="text" id="page_editor_name" name="page[editor_name]" maxlength="100" value="#{request.cookies["saved_editor_name"]}")
     
     %p.human-test
       %label(for="page_math_answer")= "What is #{@edit_problem.first} #{@edit_problem.operator} #{@edit_problem.second}?"
