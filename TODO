@@ -1,3 +1,5 @@
 * Full text search (should be easy with postgres)
-* Search page title's on /pages
+* Search filter page title's on /pages
 * Maybe beef up the spam protections without making it more inconvenient
+* Auto migrate in a rake task
+* Create homepage in auto migrate rack task

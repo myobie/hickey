@@ -31,4 +31,5 @@ Deploy
 
 * `heroku create`
 * `git push heroku master`
+* `heroku console` + `DataMapper.auto_migrate!`
 * `heroku open`
