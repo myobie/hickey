@@ -11,11 +11,12 @@ require 'dm-validations'
 require 'rdiscount'
 require 'digest/sha1'
 
-DataMapper::Logger.new(STDOUT, :debug) # :off, :fatal, :error, :warn, :info, :debug
+DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.strip}/Desktop/wiki.db")
 
 class Page
   include DataMapper::Resource
+  include DataObjects::Quoting # is this a good idea?
   
   attr_accessor :math_problem, :math_answer
   @@search_indexes = [:title, :body]
