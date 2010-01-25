@@ -81,6 +81,10 @@ p {
   display: block;
 }
 
+#meta > p {
+  margin-bottom: 0;
+}
+
 #message {
   margin: 0;
   padding: 10px 20px;
@@ -93,6 +97,22 @@ p {
 
 #message p {
   margin: 0;
+}
+
+#pages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#pages li {
+  display: block;
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+#search {
+  margin: 0 0 10px -1px;
 }
 
 /* =Form */

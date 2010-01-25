@@ -272,10 +272,12 @@ __END__
 
 @@ pages
 #content
-  %ul
+  %ul#pages
     - @pages.each do |page|
-      %li
+      %li(id="page-#{page.id}")
         %a(href="#{page.slug}")= "#{page.title} (#{page.slug})"
+#meta
+  %p All pages link to the newest version.
 
 
 @@ not_found
