@@ -12,7 +12,7 @@ Features
 * Can edit any page with markdown
 * Pretty to read (relies heavily on the base stylesheet of the browser, for now)
 * New pages can be created at any url by linking or just visiting that url
-* Search
+* Search (full text)
 * Minor spam protections
 * No users or registration (this is a feature, for now)
 
@@ -34,6 +34,11 @@ Deploy
 * `git push heroku master`
 * `heroku rake db:prepare`
 * `heroku open`
+
+Problems
+--------
+
+Postgres only for now. Hard coded SQL in the Page model.
 
 Credit
 ------
