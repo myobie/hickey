@@ -12,4 +12,12 @@ namespace :db do
     p.skip_math_problem!
     p.save
   end
+  
+  namespace :math_problems do
+    desc "Clear all math problems cached in the db"
+    task :clear do
+      require "hickey"
+      MathProblem.all.destroy
+    end
+  end
 end
