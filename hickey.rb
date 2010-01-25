@@ -42,13 +42,28 @@ class Page
     all(:slug => what, :order => [:version.asc])
   end
   
+  def skip_math_problem!
+    @skip_math_problem = true
+  end
+  
+  def destroy_after_checking(math_problem_id, math_answer)
+    self.math_problem = math_problem_id
+    self.math_answer = math_answer
+    
+    if math_problem_acceptance === true
+      self.destroy
+    else
+      false
+    end
+  end
+  
 protected
   def render_body
     self.rendered_body = RDiscount.new(body || "").to_html
   end
   
   def next_version
-    if version.blank? || version == 0
+    if version == 0 || version.blank?
       newest_page = self.class.first_for_slug(slug)
       self.version = newest_page ? newest_page.version + 1 : 1
       self.editor_name = "nobody" if editor_name.blank?
@@ -56,7 +71,7 @@ protected
   end
   
   def math_problem_acceptance
-    if MathProblem.get(math_problem).answer == math_answer.to_i
+    if @skip_math_problem || MathProblem.get(math_problem).answer == math_answer.to_i
       true
     else
       [false, "Incorrect answer given for the math problem."]
@@ -99,7 +114,7 @@ class Hickey < Sinatra::Base
   alias_method :h, :escape_html
   
   def title
-    "#{@page ? "#{@page.title} - " : ""} Hickey Wiki"
+    "#{@page ? "#{h @page.title} - " : ""} Hickey Wiki"
   end
   
   def partial(name)
@@ -113,6 +128,17 @@ class Hickey < Sinatra::Base
   
   def ip_parts
     @ip_parts ||= Digest::SHA1.hexdigest(request.ip + "lkjsdf8*&^kjdsI23").scan(/.{20}/)
+  end
+  
+  def must_have_ip_parts!
+    if params[ip_parts.first] != ip_parts.last
+      throw :halt, [500, "Problem."]
+    end
+  end
+  
+  def generate_problems # best method name ever!
+    @edit_problem = MathProblem.generate
+    @delete_problem = MathProblem.generate
   end
   
   get "/pages" do
@@ -135,14 +161,12 @@ class Hickey < Sinatra::Base
   
   get "/pages/:id/edit" do
     @page = Page.get(params[:id])
-    @problem = MathProblem.generate
+    generate_problems
     haml :edit
   end
   
   post "/pages" do
-    if params[ip_parts.first] != ip_parts.last
-      throw :halt, [404, haml(:not_found)]
-    end
+    must_have_ip_parts!
     
     @page = Page.new params[:page]
     @page.editor_ip = request.ip
@@ -151,19 +175,25 @@ class Hickey < Sinatra::Base
       redirect @page.slug
     else
       message "There is something wrong with what you submitted.", :error
-      @problem = MathProblem.generate
+      generate_problems
       haml :edit
     end
   end
   
   delete "/pages/:id" do
+    must_have_ip_parts!
+    
     @page = Page.get(params[:id])
     slug = @page.slug
-    @page.destroy
     
-    possible_past_version = Page.first_for_slug(slug)
-    
-    redirect(possible_past_version ? "#{possible_past_version.slug}" : "/")
+    if @page.destroy_after_checking(params[:math_problem], params[:math_answer])
+      possible_past_version = Page.first_for_slug(slug)
+      redirect(possible_past_version ? "#{possible_past_version.slug}" : "/")
+    else
+      message "Couldn't delete the vesion.", :error
+      generate_problems
+      haml :edit
+    end
   end
   
   get "*" do
@@ -174,7 +204,9 @@ class Hickey < Sinatra::Base
     
       if @page.blank?
         if params["create_new"] == "yes"
-          @page = Page.create(:slug => @slug)
+          @page = Page.new(:slug => @slug)
+          @page.skip_math_problem!
+          @page.save
         else
           throw :halt, [404, haml(:not_found)]
         end
@@ -206,10 +238,12 @@ __END__
     %script(src="/jquery.min.js")
     %script(src="/application.js")
 
+
 @@ message
 - unless @message.blank?
   #message(class="#{@message_type}")
     %p= @message
+
 
 @@ page
 #content
@@ -217,7 +251,7 @@ __END__
 %ul#meta
   %li
     %a(href="/pages/#{@page.id}/edit") Edit this page
-  %li= "Last edited by #{@page.editor_name}"
+  %li= "Last edited by #{h @page.editor_name}"
   %li.version
     %em= "(Version: #{@page.version})"
     - unless @pages.blank?
@@ -226,6 +260,7 @@ __END__
           %li
             %a(href="/pages/#{page.id}")= "Version #{page.version}"
 
+
 @@ pages
 #content
   %ul
@@ -233,11 +268,15 @@ __END__
       %li
         %a(href="#{page.slug}")= "#{page.title} (#{page.slug})"
 
+
 @@ not_found
 #content
   %p 
-    This page doesn't exist yet.
-    %a(href="#{@slug}?create_new=yes") Create this page
+    This page doesn't exist yet.    
+%ul#meta
+  %li
+    %a(href="#{@slug}?create_new=yes" rel="nofollow") Create this page
+
 
 @@ edit
 %noscript
@@ -263,8 +302,8 @@ __END__
       %input(type="text" id="page_editor_name" name="page[editor_name]" maxlength="100")
     
     %p.human-test
-      %label(for="page_math_answer")= "What is #{@problem.first} #{@problem.operator} #{@problem.second}?"
-      %input(type="hidden" name="page[math_problem]" value="#{@problem.id}")
+      %label(for="page_math_answer")= "What is #{@edit_problem.first} #{@edit_problem.operator} #{@edit_problem.second}?"
+      %input(type="hidden" name="page[math_problem]" value="#{@edit_problem.id}")
       %input(type="text" id="page_math_answer" name="page[math_answer]" maxlength="20")
     
     %p
@@ -275,6 +314,11 @@ __END__
   %form#delete-form(action="/pages/#{@page.id}" method="post")
     %input(type="hidden" name="_method" value="delete")
     
-    %p
+    %p.human-test
+      %label(for="math_answer")= "What is #{@delete_problem.first} #{@delete_problem.operator} #{@delete_problem.second}?"
+      %input(type="hidden" name="math_problem" value="#{@delete_problem.id}")
+      %input(type="text" id="math_answer" name="math_answer" maxlength="20")
+    
+    %p.button
       %button(type="submit") Delete this version
       %span This could be a bad idea, think about it.

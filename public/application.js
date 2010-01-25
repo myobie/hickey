@@ -1,11 +1,19 @@
 $(function() {
   
+  if (ip_parts) {
+    $("#edit-form, #delete-form").append('<input type="hidden" name="'+ip_parts[0]+'" value="'+ip_parts[1]+'">');
+  }
+  
   $("#delete-form").submit(function() {
     return confirm("Are you sure? There is no undo (yet).");
   });
   
-  if (ip_parts) {
-    $("#edit-form").append('<input type="hidden" name="'+ip_parts[0]+'" value="'+ip_parts[1]+'">');
-  }
+  $("#delete-form").hide();
+  $("#delete-form").before('<div id="delete-link"><p><a href="#">Delete this version</a></p></div>');
+  $("#delete-link a").click(function() {
+    $("#delete-link").hide();
+    $("#delete-form").show();
+    return false;
+  });
   
 });
