@@ -1,6 +1,13 @@
+class Array
+  def random
+    self[rand(length)-1]
+  end
+end
+
 require 'sinatra/base'
 require 'dm-core'
 require 'dm-timestamps'
+require 'dm-validations'
 require 'rdiscount'
 
 DataMapper::Logger.new(STDOUT, :debug) # :off, :fatal, :error, :warn, :info, :debug
@@ -8,6 +15,8 @@ DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.s
 
 class Page
   include DataMapper::Resource
+  
+  attr_accessor :math_problem, :math_answer
   
   property :id, Serial
   property :slug, String, :length => 255
@@ -21,6 +30,8 @@ class Page
   
   before :save, :render_body
   before :save, :next_version
+  
+  validates_with_method :math_problem_acceptance
   
   def self.first_for_slug(what)
     first(:slug => what, :order => [:version.desc])
@@ -41,6 +52,41 @@ protected
       self.version = newest_page ? newest_page.version + 1 : 1
       self.editor_name = "nobody" if editor_name.blank?
     end
+  end
+  
+  def math_problem_acceptance
+    if MathProblem.get(math_problem).answer == math_answer.to_i
+      true
+    else
+      [false, "Incorrect answer given for the math problem."]
+    end
+  end
+end
+
+class MathProblem
+  include DataMapper::Resource
+  
+  property :id, Serial
+  property :first, Integer
+  property :second, Integer
+  property :operator, String
+  
+  def answer
+    case operator
+    when "*"
+      first * second
+    when "-"
+      first - second
+    else
+      first + second
+    end
+  end
+  
+  def self.generate
+    operator = %w(* - +).random
+    first = rand(10)
+    second = rand(10)
+    self.first_or_create(:first => first, :second => second, :operator => operator)
   end
 end
 
@@ -84,6 +130,7 @@ class Hickey < Sinatra::Base
   
   get "/pages/:id/edit" do
     @page = Page.get(params[:id])
+    @problem = MathProblem.generate
     haml :edit
   end
   
@@ -95,6 +142,7 @@ class Hickey < Sinatra::Base
       redirect @page.slug
     else
       message "There is something wrong with what you submitted.", :error
+      @problem = MathProblem.generate
       haml :edit
     end
   end
@@ -183,6 +231,8 @@ __END__
     %a(href="#{@slug}?create_new=yes") Create this page
 
 @@ edit
+%noscript
+  #message You cannot edit pages without Javascript turned on :(
 #content
   %form#edit-form(action="/pages" method="post")
     %input(type="hidden" name="page[slug]" value="#{@page.slug}")
@@ -200,6 +250,11 @@ __END__
     %p
       %label(for="page_editor_name") Your name:
       %input(type="text" id="page_editor_name" name="page[editor_name]")
+    
+    %p.human-test
+      %label(for="page_math_answer")= "What is #{@problem.first} #{@problem.operator} #{@problem.second}?"
+      %input(type="hidden" name="page[math_problem]" value="#{@problem.id}")
+      %input(type="text" id="page[math_test_answer]" name="page[math_answer]")
     
     %p
       %button(type="submit") Create new version
