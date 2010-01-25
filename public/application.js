@@ -37,13 +37,13 @@ $(function() {
   
   // Pages search
   if ($("#pages").length === 1) {
-    $("#pages").before('<input type="search" id="search" placeholder="Filter pages">');
+    $("#pages").before('<input type="search" id="filter" placeholder="Filter pages">');
     
     $("#pages li").each(function() {
       Pages.list.push({ text: $(this).find("a").text().toLowerCase(), id: "#"+this.id });
     });
     
-    $("#search").keyup(function() {
+    $("#filter").keyup(function() {
       $("ul li:hidden").show();
       if (this.value == "") { return; }
       $(Pages.filter(this.value).join(", ")).hide();

@@ -16,7 +16,7 @@ DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.s
 
 class Page
   include DataMapper::Resource
-  include DataObjects::Quoting # is this a good idea?
+  extend DataObjects::Quoting # is this a good idea?
   
   attr_accessor :math_problem, :math_answer
   @@search_indexes = [:title, :body]
@@ -177,11 +177,13 @@ class Hickey < Sinatra::Base
   
   get "/pages" do
     @pages = Page.all_distinct
+    @pages_list_type = "pages"
     haml :pages
   end
   
-  get "/search/:q" do
+  get "/search" do
     @pages = Page.search(params[:q])
+    @pages_list_type = "search"
     haml :pages
   end
   
@@ -271,6 +273,10 @@ __END__
         %a(href="/") Homepage
       %li
         %a(href="/pages") All pages
+      %li.search
+        %form(action="/search" method="get")
+          %input(type="search" placeholder="Search" name="q" value="#{params[:q]}")
+          %button(type="submit") Search
     = partial :message
     = yield
     %script(src="/jquery.min.js")
@@ -301,7 +307,7 @@ __END__
 
 @@ pages
 #content
-  %ul#pages
+  %ul(id="#{@pages_list_type}")
     - @pages.each do |page|
       %li(id="page-#{page.id}")
         %a(href="#{page.slug}")= "#{page.title} (#{page.slug})"

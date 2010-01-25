@@ -111,8 +111,18 @@ p {
   font-size: 16px;
 }
 
-#search {
+#filter {
   margin: 0 0 10px -1px;
+}
+
+.search form {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.search button {
+  display: none;
 }
 
 /* =Form */
