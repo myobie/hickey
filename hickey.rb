@@ -18,13 +18,14 @@ class Page
   include DataMapper::Resource
   
   attr_accessor :math_problem, :math_answer
+  @@search_indexes = [:title, :body]
   
   property :id, Serial
-  property :slug, String, :length => 255
+  property :slug, String, :length => 255, :index => true
   property :title, String, :length => 255
   property :body, Text
   property :rendered_body, Text
-  property :version, Integer, :default => 0
+  property :version, Integer, :default => 0, :index => true
   property :editor_name, String, :length => 255, :default => "Nobody"
   property :editor_ip, String
   property :created_at, DateTime
@@ -40,6 +41,16 @@ class Page
   
   def self.all_for_slug(what)
     all(:slug => what, :order => [:version.asc])
+  end
+  
+  def self.all_distinct
+    # ATTENTION: this will only work with postgres (sorry)
+    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY slug ASC, version DESC")
+  end
+  
+  def self.search(what)
+    # ATTENTION: this will only work with postgres (sorry)
+    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages WHERE title_search_index @@ plainto_tsquery(#{quote_value(what)}) OR body_search_index @@ plainto_tsquery(#{quote_value(what)}) ORDER BY slug ASC, version DESC")
   end
   
   def skip_math_problem!
@@ -75,6 +86,19 @@ protected
       true
     else
       [false, "Incorrect answer given for the math problem."]
+    end
+  end
+  
+  def escape_search_string(str)
+    str.gsub(/([\0\n\r\032\'\"\\])/) do
+      case $1
+      when "\0" then "\\0"
+      when "\n" then "\\n"
+      when "\r" then "\\r"
+      when "\032" then "\\Z"
+      when "'"  then "''"
+      else "\\"+$1
+      end
     end
   end
 end
@@ -151,8 +175,12 @@ class Hickey < Sinatra::Base
   end
   
   get "/pages" do
-    # ATTENTION: this will only work with postgres (sorry)
-    @pages = repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY slug ASC, version DESC")
+    @pages = Page.all_distinct
+    haml :pages
+  end
+  
+  get "/search/:q" do
+    @pages = Page.search(params[:q])
     haml :pages
   end
   

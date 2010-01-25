@@ -2,5 +2,6 @@ rdiscount --version 1.5.5
 dm-core --version 0.10.2
 dm-timestamps --version 0.10.2
 dm-validations --version 0.10.2
+dm-migrations --version 0.10.2
 sinatra --version 0.9.4
 do_postgres --version 0.10.1

@@ -33,3 +33,8 @@ Deploy
 * `git push heroku master`
 * `heroku console` + `DataMapper.auto_migrate!`
 * `heroku open`
+
+Credit
+------
+
+Search code is heavily inspired by: <http://gist.github.com/217158>
