@@ -3,8 +3,8 @@ require 'dm-core'
 require 'dm-timestamps'
 require 'rdiscount'
 
-DataMapper::Logger.new(STDOUT, :debug) # :off, :fatal, :error, :warn, :info, :debug
-DataMapper.setup :default, "sqlite3:///Users/nathan/Desktop/wiki.db"
+DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`}/Desktop/wiki.db")
 
 class Page
   include DataMapper::Resource
