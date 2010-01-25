@@ -9,6 +9,7 @@ require 'dm-core'
 require 'dm-timestamps'
 require 'dm-validations'
 require 'rdiscount'
+require 'digest/sha1'
 
 DataMapper::Logger.new(STDOUT, :debug) # :off, :fatal, :error, :warn, :info, :debug
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3:///Users/#{`whoami`.strip}/Desktop/wiki.db")
@@ -84,8 +85,8 @@ class MathProblem
   
   def self.generate
     operator = %w(* - +).random
-    first = rand(10)
-    second = rand(10)
+    first = rand(10) + 1
+    second = rand(10) + 1
     self.first_or_create(:first => first, :second => second, :operator => operator)
   end
 end
@@ -108,6 +109,10 @@ class Hickey < Sinatra::Base
   def message(what, type = "notice")
     @message = what
     @message_type = type
+  end
+  
+  def ip_parts
+    @ip_parts ||= Digest::SHA1.hexdigest(request.ip + "lkjsdf8*&^kjdsI23").scan(/.{20}/)
   end
   
   get "/pages" do
@@ -135,8 +140,12 @@ class Hickey < Sinatra::Base
   end
   
   post "/pages" do
+    if params[ip_parts.first] != ip_parts.last
+      throw :halt, [404, haml(:not_found)]
+    end
+    
     @page = Page.new params[:page]
-    @page.editor_ip = @env['REMOTE_ADDR']
+    @page.editor_ip = request.ip
     
     if @page.save
       redirect @page.slug
@@ -234,6 +243,8 @@ __END__
 %noscript
   #message You cannot edit pages without Javascript turned on :(
 #content
+  %script= "var ip_parts = ['#{ip_parts.first}', '#{ip_parts.last}'];"
+  
   %form#edit-form(action="/pages" method="post")
     %input(type="hidden" name="page[slug]" value="#{@page.slug}")
     
@@ -241,7 +252,7 @@ __END__
     
     %p
       %label(for="page_title") Title:
-      %input(type="text" id="page_title" name="page[title]" value="#{@page.title}")
+      %input(type="text" id="page_title" name="page[title]" value="#{@page.title}" maxlength="255")
     
     %p
       %label(for="page_body") Body:
@@ -249,12 +260,12 @@ __END__
     
     %p
       %label(for="page_editor_name") Your name:
-      %input(type="text" id="page_editor_name" name="page[editor_name]")
+      %input(type="text" id="page_editor_name" name="page[editor_name]" maxlength="100")
     
     %p.human-test
       %label(for="page_math_answer")= "What is #{@problem.first} #{@problem.operator} #{@problem.second}?"
       %input(type="hidden" name="page[math_problem]" value="#{@problem.id}")
-      %input(type="text" id="page_math_answer" name="page[math_answer]")
+      %input(type="text" id="page_math_answer" name="page[math_answer]" maxlength="20")
     
     %p
       %button(type="submit") Create new version
