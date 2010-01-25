@@ -21,11 +21,16 @@ migration(1, :create_pages) do
 end
 
 migration(2, :create_math_problems) do
-  create_table :math_problems do
-    column :id, DataMapper::Types::Serial
-    column :first, Integer
-    column :second, Integer
-    column :operator, String
+  up do
+    create_table :math_problems do
+      column :id, DataMapper::Types::Serial
+      column :first, Integer
+      column :second, Integer
+      column :operator, String
+    end
+  end
+  down do
+    drop_table :math_problems
   end
 end
 
