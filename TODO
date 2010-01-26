@@ -1,3 +1,5 @@
 * Re-slug (change slug of all versions) [this is based on my actual use]
 * Better error messages
 * Maybe beef up the spam protections without making it more inconvenient
+* Diffs ? (using html diff)
+* Don't create a new version if the content is the same (sha1 maybe?)
