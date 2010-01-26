@@ -26,6 +26,7 @@ Install
 
 * Clone
 * Create a postgres db called hickey (or pass in DATABASE_URL)
+* `rake db:prepare`
 * Boot up with shotgun `shotgun config.ru`
 
 Deploy
