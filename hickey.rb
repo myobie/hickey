@@ -175,6 +175,22 @@ class Hickey < Sinatra::Base
     @delete_problem = MathProblem.generate
   end
   
+  def crumbs
+    return unless @page && params["splat"]
+    slug_parts = @page.slug.split("/").reject { |a| a.blank? }
+    DataMapper.logger.info slug_parts.inspect
+    return if slug_parts.length < 2
+    
+    slug_parts.delete_at(-1) # remove the page we are on
+    
+    slug_parts.collect { |part|
+      {
+        :url => "/" + slug_parts[0..slug_parts.index(part)].join("/"),
+        :name => part
+      }
+    }
+  end
+  
   get "/pages" do
     @pages = Page.all_distinct
     @pages_list_type = "pages"
@@ -288,10 +304,18 @@ __END__
   #message(class="#{@message_type}")
     %p= @message
 
+@@ breadcrumbs
+- if crumbs.length > 0
+  %ul.breadcrumbs
+    %li homepage
+    - crumbs.each do |crumb|
+      %li
+        %a(href="#{crumb[:url]}")= crumb[:name]
 
 @@ page
 #content
   = @page.rendered_body
+= partial :breadcrumbs
 %ul#meta
   %li
     %a(href="/pages/#{@page.id}/edit") Edit this page

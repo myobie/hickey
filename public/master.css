@@ -127,6 +127,34 @@ p {
   display: none;
 }
 
+/* = Breadcrumbs */
+
+.breadcrumbs {
+  border-top: 1px solid #f0f0f0;
+  margin: 0;
+  padding: 10px 20px;
+  list-style-type: none;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.breadcrumbs li {
+  margin: 0 2px 0 0;
+  padding: 0;
+  display: inline;
+}
+
+.breadcrumbs li:before {
+  content: "> ";
+  padding: 0 1px 0 0;
+  color: #afafaf;
+}
+
+.breadcrumbs li:first-child:before {
+  content: "";
+  padding: 0;
+}
+
 /* =Form */
 
 form label {
