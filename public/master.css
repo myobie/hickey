@@ -193,6 +193,7 @@ hr.delete {
 
 #delete-link {
   margin: 2em 0 0;
+  padding-bottom: 1px;
 }
 
 #delete-link a {

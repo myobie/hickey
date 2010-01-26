@@ -44,9 +44,14 @@ var Pages = {
   }
 };
 
+var EditForm = {};
+
 $(function() {
   
   // Edit & Delete
+  
+  var edit_form = $("#edit-form");
+  var delete_form = $("#delete-form");
   
   if (typeof ip_parts != "undefined") {
     $("#edit-form, #delete-form").
@@ -54,20 +59,37 @@ $(function() {
       append('<input type="hidden" name="ip_last" value="'+ip_parts[1]+'">');
   }
   
-  $("#delete-form").submit(function() {
+  delete_form.submit(function() {
     return confirm("Are you sure? There is no undo (yet).");
   });
   
-  $("#edit-form").submit(function() {
+  edit_form.submit(function() {
     Cookie.set("saved_editor_name", $("#page_editor_name").val(), 365);
   });
   
-  $("#delete-form").hide();
-  $("#delete-form").before('<div id="delete-link"><p><a href="#">Delete this version</a></p></div>');
+  delete_form.hide();
+  delete_form.before('<div id="delete-link"><p><a href="#">Delete this version</a></p></div>');
   $("#delete-link a").click(function() {
     $("#delete-link").hide();
     $("#delete-form").show();
     return false;
+  });
+  
+  $("#edit-form p:last").append('or <button id="preview" type="submit">Preview</button>');
+  
+  $("#preview").click(function() {
+    var action = edit_form.attr("action");
+    
+    var change_back = function() {
+      console.log(action);
+      edit_form.attr("action", action);
+      edit_form.attr("target", "");
+    };
+    
+    edit_form.attr("action", "/preview");
+    edit_form.attr("target", "_blank");
+    
+    setTimeout(change_back, 100); // this is crazy!
   });
   
   // Pages search
@@ -84,5 +106,8 @@ $(function() {
       $(Pages.filter(this.value).join(", ")).hide();
     });
   }
+  
+  // Preview click to close
+  $("#content.preview + #meta p").html('<a href="#" onclick="window.close()">Close this window</a>');
   
 });

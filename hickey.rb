@@ -254,6 +254,12 @@ class Hickey < Sinatra::Base
     end
   end
   
+  post "/preview" do
+    @body = RDiscount.new(params[:body] || params[:page][:body] || "").to_html
+    message "This is not saved yet, this is only a preview."
+    haml :preview
+  end
+  
   get "*" do
     repository do
       @slug = params["splat"].join("/")
@@ -313,6 +319,12 @@ __END__
     - crumbs.each do |crumb|
       %li
         %a(href="#{crumb[:url]}")= crumb[:name]
+
+@@ preview
+#content.preview
+  = @body
+#meta
+  %p You can close this window when finished.
 
 @@ page
 #content
