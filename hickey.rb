@@ -176,19 +176,21 @@ class Hickey < Sinatra::Base
   end
   
   def crumbs
-    return unless @page && params["splat"]
-    slug_parts = @page.slug.split("/").reject { |a| a.blank? }
-    DataMapper.logger.info slug_parts.inspect
-    return if slug_parts.length < 2
+    @crumbs ||= lambda do
+      return [] unless @page && params["splat"]
+      slug_parts = @page.slug.split("/").reject { |a| a.blank? }
+      DataMapper.logger.info slug_parts.inspect
+      return [] if slug_parts.length < 2
     
-    slug_parts.delete_at(-1) # remove the page we are on
+      slug_parts.delete_at(-1) # remove the page we are on
     
-    slug_parts.collect { |part|
-      {
-        :url => "/" + slug_parts[0..slug_parts.index(part)].join("/"),
-        :name => part
+      slug_parts.collect { |part|
+        {
+          :url => "/" + slug_parts[0..slug_parts.index(part)].join("/"),
+          :name => part
+        }
       }
-    }
+    end.call
   end
   
   get "/pages" do
