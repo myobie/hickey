@@ -29,6 +29,7 @@ var Cookie = {
   }
 };
 
+// pages list filter
 var Pages = {
   list: [],
   filter: function(what) {
@@ -44,55 +45,62 @@ var Pages = {
   }
 };
 
-var EditForm = {};
-
+// on dom load
 $(function() {
+  
+  // Version chooser
+  $("#versions").change(function() { window.location = this.value; });
   
   // Edit & Delete
   
-  var edit_form = $("#edit-form");
-  var delete_form = $("#delete-form");
-  
-  if (typeof ip_parts != "undefined") {
-    $("#edit-form, #delete-form").
-      append('<input type="hidden" name="ip_first" value="'+ip_parts[0]+'">').
-      append('<input type="hidden" name="ip_last" value="'+ip_parts[1]+'">');
+  if ($("#edit-form").length > 0) {
+    
+    var edit_form = $("#edit-form");
+    var delete_form = $("#delete-form");
+
+    if (typeof ip_parts != "undefined") {
+      $("#edit-form, #delete-form").
+        append('<input type="hidden" name="ip_first" value="'+ip_parts[0]+'">').
+        append('<input type="hidden" name="ip_last" value="'+ip_parts[1]+'">');
+    }
+
+    delete_form.submit(function() {
+      return confirm("Are you sure? There is no undo (yet).");
+    });
+
+    edit_form.submit(function() {
+      Cookie.set("saved_editor_name", $("#page_editor_name").val(), 365);
+    });
+
+    delete_form.hide();
+    delete_form.before('<div id="delete-link"><p><a href="#">Delete this version</a></p></div>');
+    $("#delete-link a").click(function() {
+      $("#delete-link").hide();
+      $("#delete-form").show();
+      return false;
+    });
+
+    $("#edit-form p:last").append('or <button id="preview" type="submit">Preview</button>');
+
+    $("#preview").click(function() {
+      var action = edit_form.attr("action");
+
+      var change_back = function() {
+        console.log(action);
+        edit_form.attr("action", action);
+        edit_form.attr("target", "");
+      };
+
+      edit_form.attr("action", "/preview");
+      edit_form.attr("target", "_blank");
+
+      setTimeout(change_back, 100); // this is crazy!
+    });
+    
   }
   
-  delete_form.submit(function() {
-    return confirm("Are you sure? There is no undo (yet).");
-  });
-  
-  edit_form.submit(function() {
-    Cookie.set("saved_editor_name", $("#page_editor_name").val(), 365);
-  });
-  
-  delete_form.hide();
-  delete_form.before('<div id="delete-link"><p><a href="#">Delete this version</a></p></div>');
-  $("#delete-link a").click(function() {
-    $("#delete-link").hide();
-    $("#delete-form").show();
-    return false;
-  });
-  
-  $("#edit-form p:last").append('or <button id="preview" type="submit">Preview</button>');
-  
-  $("#preview").click(function() {
-    var action = edit_form.attr("action");
-    
-    var change_back = function() {
-      console.log(action);
-      edit_form.attr("action", action);
-      edit_form.attr("target", "");
-    };
-    
-    edit_form.attr("action", "/preview");
-    edit_form.attr("target", "_blank");
-    
-    setTimeout(change_back, 100); // this is crazy!
-  });
-  
   // Pages search
+  
   if ($("#pages").length === 1) {
     $("#pages").before('<input type="search" id="filter" placeholder="Filter pages">');
     

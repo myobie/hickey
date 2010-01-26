@@ -4,7 +4,8 @@ html {
 
 body {
   width: 520px;
-  margin: 0 auto 20px;
+  margin: 0 auto;
+  padding: 0 0 1px;
   background: #fff;
   color: #222;
   font: 14px/1.6 "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
@@ -176,9 +177,9 @@ hr.delete {
 }
 
 #delete-form {
-  margin: 2em -10px 0;
+  margin: 2em -20px 0;
   background: #ffdfdb;
-  padding: 10px;
+  padding: 10px 20px;
 }
 
 #delete-form p.button {

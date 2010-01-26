@@ -41,7 +41,7 @@ class Page
   end
   
   def self.all_for_slug(what)
-    all(:slug => what, :order => [:version.asc])
+    all(:slug => what, :order => [:version.desc])
   end
   
   def self.all_distinct
@@ -210,9 +210,7 @@ class Hickey < Sinatra::Base
       @page = Page.get(params[:id])
       @pages = Page.all_for_slug(@page.slug)
     
-      message "This is an older version (#{@page.version})." if @pages.last != @page
-    
-      @pages =  (@pages - @page).reverse
+      message "This is an older version (#{@page.version})." unless @pages.first == @page
       body haml(:page)
     end
   end
@@ -276,7 +274,7 @@ class Hickey < Sinatra::Base
         end
       end
     
-      @pages = (Page.all_for_slug(@slug) - @page).reverse
+      @pages = Page.all_for_slug(@slug)
     
       body haml(:page)
     end
@@ -335,12 +333,16 @@ __END__
     %a(href="/pages/#{@page.id}/edit") Edit this page
   %li= "Last edited by #{h @page.editor_name}"
   %li.version
-    %em= "(Version: #{@page.version})"
-    - unless @pages.blank?
-      %ul.versions
-        - @pages.each do |page|
-          %li
-            %a(href="/pages/#{page.id}")= "Version #{page.version}"
+    %select#versions
+      - @pages.each do |page|
+        %option{ :value => "/pages/#{page.id}", :selected => (@page == page ? "selected" : nil) }= "Version #{page.version}"
+    /
+      %em= "(Version: #{@page.version})"
+      - unless @pages.blank?
+        %ul.versions
+          - @pages.each do |page|
+            %li
+              %a(href="/pages/#{page.id}")= "Version #{page.version}"
 
 
 @@ pages
