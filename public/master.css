@@ -4,7 +4,7 @@ html {
 
 body {
   width: 520px;
-  margin: 0 auto;
+  margin: 0 auto 20px;
   background: #fff;
   color: #222;
   font: 14px/1.6 "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
