@@ -289,6 +289,7 @@ __END__
   %head
     %title= title
     %link(rel="stylesheet" href="/master.css" type="text/css")
+    %meta(name="viewport" content="width=520")
   %body
     %ul#links
       %li
