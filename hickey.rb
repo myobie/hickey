@@ -326,7 +326,7 @@ __END__
 
 @@ page
 #content
-  = @page.rendered_body
+  ~ @page.rendered_body
 = partial :breadcrumbs
 %ul#meta
   %li
