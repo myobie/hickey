@@ -285,6 +285,7 @@ class Hickey < Sinatra::Base
     
     if @page_before
       @diff = Diff.for(@page_before, @page).diff
+      message "Diffs show the original author's text in markdown format."
     else
       message "Version #{@page.version - 1} has been removed or never existed."
     end
