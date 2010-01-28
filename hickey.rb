@@ -400,7 +400,7 @@ __END__
 
 @@ preview
 #content.preview
-  = @body
+  ~ @body
 #meta
   %p You can close this window when finished.
 
