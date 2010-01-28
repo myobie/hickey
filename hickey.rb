@@ -180,8 +180,7 @@ class Diff
 protected
   def create_diff
     if diff.blank?
-      body_diff = self.class.diff(older_page.body || "", newer_page.body || "")
-      self.diff = RDiscount.new(body_diff).to_html
+      self.diff = self.class.diff(older_page.body || "", newer_page.body || "").gsub(/\n/, "<br>")
     end
   end
 end
