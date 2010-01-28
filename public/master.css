@@ -105,17 +105,26 @@ code {
 }
 
 #pages,
-#search {
+#search,
+#recent {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
 #pages li,
-#search li {
+#search li,
+#recent li {
   display: block;
   margin: 0 0 5px;
   font-size: 16px;
+}
+
+#recent li em.created-at {
+  color: #919191;
+  font-size: 12px;
+  font-style: normal;
+  margin-left: 10px;
 }
 
 #filter {

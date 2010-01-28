@@ -46,12 +46,30 @@ class Page
   
   def self.all_distinct
     # ATTENTION: this will only work with postgres (sorry)
-    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages ORDER BY slug ASC, version DESC")
+    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version, created_at FROM pages ORDER BY slug ASC, version DESC")
   end
   
   def self.search(what)
     # ATTENTION: this will only work with postgres (sorry)
-    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version FROM pages WHERE title_search_index @@ plainto_tsquery(#{quote_value(what)}) OR body_search_index @@ plainto_tsquery(#{quote_value(what)}) ORDER BY slug ASC, version DESC")
+    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version, created_at FROM pages WHERE title_search_index @@ plainto_tsquery(#{quote_value(what)}) OR body_search_index @@ plainto_tsquery(#{quote_value(what)}) ORDER BY slug ASC, version DESC")
+  end
+  
+  def self.recent
+    # all(:created_at.gt => Time.now - (86400 * 2))
+    # ATTENTION: this will only work with postgres (sorry)
+    repository.adapter.select("SELECT DISTINCT ON (slug) id, slug, title, version, created_at FROM pages WHERE created_at > '#{Time.now - (86400 * 2)}' ORDER BY slug ASC, version DESC")
+  end
+  
+  def relative_time
+    distance = Time.now - created_at.to_time
+    time = created_at.strftime("%I:%M %p").downcase.gsub(/^0/, "")
+    if distance > 86400 * 2
+      "last modified 2 days ago at #{time}"
+    elsif distance > 86400
+      "last modified 1 day ago at #{time}"
+    else
+      "last modified at #{time}"
+    end
   end
   
   def skip_math_problem!
@@ -151,6 +169,11 @@ class Hickey < Sinatra::Base
     @message_type = type
   end
   
+  def relative_time_for(page_struct)
+    page = Page.new :created_at => page_struct.created_at
+    page.relative_time
+  end
+  
   # to work around a bug at heroku
   def request_ip
     if addr = @env['HTTP_X_FORWARDED_FOR']
@@ -203,6 +226,11 @@ class Hickey < Sinatra::Base
     @pages = Page.search(params[:q])
     @pages_list_type = "search"
     haml :pages
+  end
+  
+  get "/recent" do
+    @pages = Page.recent
+    haml :recent
   end
   
   get "/pages/:id" do
@@ -296,6 +324,8 @@ __END__
         %a(href="/") Homepage
       %li
         %a(href="/pages") All pages
+      %li
+        %a(href="/recent") Recently updated
       %li.search
         %form(action="/search" method="get")
           %input(type="search" placeholder="Search" name="q" value="#{params[:q]}")
@@ -354,6 +384,16 @@ __END__
         %a(href="#{page.slug}")= "#{page.title} (#{page.slug})"
 #meta
   %p All pages link to the newest version.
+
+@@ recent
+#content
+  %ul#recent
+    - @pages.each do |page|
+      %li(id="page-#{page.id}")
+        %a(href="#{page.slug}")= "#{page.title} (#{page.slug})"
+        %em.created-at= relative_time_for(page)
+#meta
+  %p Listing all pages updated in the last 48 hours.
 
 
 @@ not_found
