@@ -10,6 +10,7 @@ require 'dm-timestamps'
 require 'dm-validations'
 require 'rdiscount'
 require 'digest/sha1'
+require 'htmldiff'
 
 DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://localhost/hickey")
@@ -151,6 +152,39 @@ class MathProblem
   end
 end
 
+class Diff
+  include DataMapper::Resource
+  extend HTMLDiff
+  
+  property :newer_page_id, Integer, :key => true
+  property :older_page_id, Integer, :key => true
+  property :diff, Text
+  
+  # DM has a bug that tries to save these even tho they haven't changed
+  # belongs_to :newer_page, :model => "Page"
+  # belongs_to :older_page, :model => "Page"
+  
+  def self.for(older, newer)
+    first_or_create(:older_page_id => older.id, :newer_page_id => newer.id)
+  end
+  
+  def newer_page
+    Page.get(newer_page_id)
+  end
+  def older_page
+    Page.get(older_page_id)
+  end
+  
+  before :save, :create_diff
+
+protected
+  def create_diff
+    if diff.blank?
+      self.diff = self.class.diff(older_page.body || "", newer_page.body || "")
+    end
+  end
+end
+
 class Hickey < Sinatra::Base
   enable :methodoverride, :static, :sessions, :logging
   set :app_file, __FILE__
@@ -243,6 +277,19 @@ class Hickey < Sinatra::Base
       message "This is an older version (#{@page.version})." unless @pages.first == @page
       body haml(:page)
     end
+  end
+  
+  get "/pages/:id/diff" do
+    @page = Page.get(params[:id])
+    @page_before = Page.first(:slug => @page.slug, :version => @page.version - 1)
+    
+    if @page_before
+      @diff = Diff.for(@page_before, @page).diff
+    else
+      message "Version #{@page.version - 1} has been removed or never existed."
+    end
+    
+    haml :diff
   end
   
   get "/pages/:id/edit" do
@@ -357,6 +404,18 @@ __END__
 #meta
   %p You can close this window when finished.
 
+@@ diff
+- if @diff
+  #content.diff
+    ~ @diff
+#meta
+  %p
+    - if @page_before
+      = "Showing the differences between versions #{@page.version} and #{@page_before.version}."
+      %a(href="/pages/#{@page.id}")= "Back to version #{@page.version}"
+    - else
+      Not able to show a diff.
+
 @@ page
 #content
   ~ @page.rendered_body
@@ -369,14 +428,9 @@ __END__
     %select#versions
       - @pages.each do |page|
         %option{ :value => "/pages/#{page.id}", :selected => (@page == page ? "selected" : nil) }= "Version #{page.version}"
-    /
-      %em= "(Version: #{@page.version})"
-      - unless @pages.blank?
-        %ul.versions
-          - @pages.each do |page|
-            %li
-              %a(href="/pages/#{page.id}")= "Version #{page.version}"
-
+  - if @page.version > 1
+    %li.diff
+      %a(href="/pages/#{@page.id}/diff")= "Show differences from version #{@page.version - 1}"
 
 @@ pages
 #content

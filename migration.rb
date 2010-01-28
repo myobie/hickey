@@ -59,6 +59,19 @@ migration(3, :add_text_indexing_to_pages) do
   end
 end
 
+migration(4, :add_diff) do
+  up do
+    create_table :diffs do
+      column :newer_page_id, Integer, :key => true
+      column :older_page_id, Integer, :key => true
+      column :diff, DataMapper::Types::Text
+    end
+  end
+  down do
+    drop_table :diffs
+  end
+end
+
 
 
 if $0 == __FILE__

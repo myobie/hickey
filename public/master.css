@@ -19,6 +19,18 @@ code {
   background: #fff;
 }
 
+ins {
+  background: #d9ffd9;
+  text-decoration: none;
+  padding: 2px;
+}
+
+del {
+  background-color: #ffe2e0;
+  padding: 2px;
+  text-decoration: line-through;
+}
+
 #links,
 #meta {
   list-style-type: none;
@@ -50,8 +62,22 @@ code {
   border-bottom: none;
 }
 
+#meta li.diff {
+  display: block;
+  margin: 3px 0 1px;
+}
+
+#meta li.diff a {
+  color: #919191;
+  font-size: 12px;
+}
+
 #meta li.version {
   position: relative;
+}
+
+#meta li.version:after {
+  content: "";
 }
 
 #meta li.version em {
