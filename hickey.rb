@@ -378,7 +378,7 @@ __END__
     
     %p
       %label(for="page_title") Title:
-      %input(type="text" id="page_title" name="page[title]" value="#{@page.title}" maxlength="255")
+      %input(type="text" id="page_title" name="page[title]" value="#{@page.title}" maxlength="255" autofocus)
     
     %p
       %label(for="page_body") Body:
