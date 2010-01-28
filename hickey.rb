@@ -63,7 +63,7 @@ class Page
   def relative_time
     distance = Time.now - created_at.to_time
     time = created_at.strftime("%I:%M %p").downcase.gsub(/^0/, "")
-    hours = distance / 60 / 60
+    hours = (distance / 60 / 60).to_i
     
     if hours > 1
       "last modified #{hours} hours ago at #{time}"
