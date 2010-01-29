@@ -1,33 +1,35 @@
 hickey is a wiki
 ================
 
-Why
----
+Why the name
+------------
 
-It was a fun few hours.
+Because it sucks that much.
 
 Features
 --------
 
-* Can edit any page with markdown
-* Pretty to read (relies heavily on the base stylesheet of the browser, for now)
-* New pages can be created at any url by linking or just visiting that url
+* Markdown
+* Pretty to read
+* New pages can be created at any url
 * Search (full text)
 * Minor spam protections
 * No users or registration (this is a feature, for now)
+* Diffs between versions
+* Recently updated pages
 
-Gems
-----
+Required before install
+-----------------------
 
-Look at .gems to see what gems it uses. 
+* [git](http://git-scm.com/)
+* [ruby](http://www.ruby-lang.org/) (on mac, you already have this)
+* [ruby gems](http://docs.rubygems.org/read/chapter/3) (on mac, you already have this)
+* heroku gem (`gem install heroku`) (you may need to use `sudo`)
 
 Install
 -------
 
-* Clone
-* Create a postgres db called hickey (or pass in DATABASE_URL)
-* `rake db:prepare`
-* Boot up with shotgun `shotgun config.ru`
+* Clone (`git clone git://github.com/myobie/hickey.git`)
 
 Deploy
 ------
@@ -36,6 +38,19 @@ Deploy
 * `git push heroku master`
 * `heroku rake db:prepare`
 * `heroku open`
+
+Rename your heroku subdomain
+----------------------------
+
+* `heroku rename flowers` (flowers being what you want it to be called)
+
+Develop
+-------
+
+* Install all gems in .gems
+* Create a postgres db called hickey (or pass in DATABASE_URL)
+* `rake db:prepare`
+* Boot up with shotgun `shotgun config.ru`
 
 Problems
 --------
