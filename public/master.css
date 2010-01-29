@@ -245,3 +245,7 @@ hr.delete {
 }
 
 /* =Content */
+
+#content.diff pre {
+  white-space: pre-wrap;
+}

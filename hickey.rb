@@ -180,8 +180,12 @@ class Diff
 protected
   def create_diff
     if diff.blank?
-      self.diff = self.class.diff(older_page.body || "", newer_page.body || "").gsub(/\n/, "<br>")
+      self.diff = self.class.diff(h(older_page.body), h(newer_page.body))
     end
+  end
+  
+  def h(what)
+    Rack::Utils.escape_html(what)
   end
 end
 
@@ -408,7 +412,7 @@ __END__
 @@ diff
 - if @diff
   #content.diff
-    ~ @diff
+    %pre~ @diff
 #meta
   %p
     - if @page_before

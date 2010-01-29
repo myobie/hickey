@@ -13,11 +13,17 @@ namespace :db do
     p.save
   end
   
-  namespace :math_problems do
+  namespace :clear do
     desc "Clear all math problems cached in the db"
-    task :clear do
+    task :math_problems do
       require "hickey"
       MathProblem.all.destroy
+    end
+    
+    desc "Clear all diffs cached in the db"
+    task :diffs do
+      require "hickey"
+      Diff.all.destroy
     end
   end
 end
