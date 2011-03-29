@@ -1,6 +1,7 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    activesupport (3.0.5)
     addressable (2.2.4)
     bcrypt-ruby (2.1.4)
     data_objects (0.10.3)
@@ -44,6 +45,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport (= 3.0.5)
   dm-core (= 1.1.0)
   dm-migrations (= 1.1.0)
   dm-postgres-adapter (= 1.1.0)
