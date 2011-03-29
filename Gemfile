@@ -1,0 +1,7 @@
+gem "rdiscount", :version => "1.6.8"
+gem "dm-core", :version => "1.1.0"
+gem "dm-timestamps", :version => "1.1.0"
+gem "dm-validations", :version => "1.1.0"
+gem "dm-migrations", :version => "1.1.0"
+gem "dm-postgres-adapter", :version => "1.1.0"
+gem "sinatra", :version => "1.2.1"
