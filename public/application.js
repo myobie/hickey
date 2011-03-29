@@ -105,7 +105,7 @@ $(function() {
     
     // make it possible to tab in the edit textarea
     $("#page_body").keydown(function(event) {
-      console.log(event.which, event.metaKey);
+      // console.log(event.which, event.metaKey);
       if (event.which == 9 || (event.which == 221 && event.metaKey)) {
         event.preventDefault();
         var starting_pos, ending_pos, new_value;
