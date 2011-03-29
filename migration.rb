@@ -1,14 +1,17 @@
-require 'hickey'
+$: << File.dirname(__FILE__)
+require 'dm-migrations'
 require 'dm-migrations/migration_runner'
+require 'dm-types'
+require 'hickey'
 
 migration(1, :create_pages) do
   up do
     create_table :pages do
-      column :id, DataMapper::Types::Serial
+      column :id, Serial
       column :slug, String, :length => 255, :index => true
       column :title, String, :length => 255
-      column :body, DataMapper::Types::Text
-      column :rendered_body, DataMapper::Types::Text
+      column :body, Text
+      column :rendered_body, Text
       column :version, Integer, :default => 0, :index => true
       column :editor_name, String, :length => 255, :default => "nobody"
       column :editor_ip, String
@@ -23,7 +26,7 @@ end
 migration(2, :create_math_problems) do
   up do
     create_table :math_problems do
-      column :id, DataMapper::Types::Serial
+      column :id, Serial
       column :first, Integer
       column :second, Integer
       column :operator, String
@@ -46,7 +49,7 @@ migration(3, :add_text_indexing_to_pages) do
       CREATE TRIGGER title_index_update BEFORE INSERT OR UPDATE ON pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(title_search_index, 'pg_catalog.english', title);
       CREATE TRIGGER body_index_update BEFORE INSERT OR UPDATE ON pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(body_search_index, 'pg_catalog.english', body);
     EOF
-    repository.adapter.execute(ADD_TEXT_INDEXING_TO_MEMORY)
+    DataMapper.repository.adapter.execute(ADD_TEXT_INDEXING_TO_MEMORY)
   end
   down do
     REMOVE_TEXT_INDEXING_TO_MEMORY = <<-EOF
@@ -55,7 +58,7 @@ migration(3, :add_text_indexing_to_pages) do
       DROP TRIGGER title_index_update;
       DROP TRIGGER body_index_update;
     EOF
-    repository.adapter.execute(REMOVE_TEXT_INDEXING_TO_MEMORY)
+    DataMapper.repository.adapter.execute(REMOVE_TEXT_INDEXING_TO_MEMORY)
   end
 end
 
@@ -64,7 +67,7 @@ migration(4, :add_diff) do
     create_table :diffs do
       column :newer_page_id, Integer, :key => true
       column :older_page_id, Integer, :key => true
-      column :diff, DataMapper::Types::Text
+      column :diff, Text
     end
   end
   down do

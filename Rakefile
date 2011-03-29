@@ -1,3 +1,5 @@
+$: << File.dirname(__FILE__)
+
 namespace :db do
   desc "Migrate the DB"
   task :migrate do

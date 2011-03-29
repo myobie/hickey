@@ -1,3 +1,5 @@
+$: << File.dirname(__FILE__)
+
 class Array
   def random
     self[rand(length)-1]
@@ -11,6 +13,7 @@ require 'dm-validations'
 require 'rdiscount'
 require 'digest/sha1'
 require 'htmldiff'
+require 'active_support/core_ext/object/blank'
 
 DataMapper::Logger.new(STDOUT, :info) # :off, :fatal, :error, :warn, :info, :debug
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://localhost/hickey")
@@ -189,11 +192,13 @@ protected
   end
 end
 
+
+
 class Hickey < Sinatra::Base
-  enable :methodoverride, :static, :sessions, :logging
+  enable :methodoverride, :static, :sessions, :logging, :inline_templates
   set :app_file, __FILE__
   set :haml, { :format => :html5 }
-  use_in_file_templates!
+  # use_in_file_templates!
   alias_method :h, :escape_html
   
   def title
