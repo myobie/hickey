@@ -1,0 +1,40 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    addressable (2.2.4)
+    data_objects (0.10.3)
+      addressable (~> 2.1)
+    dm-core (1.1.0)
+      addressable (~> 2.2.4)
+    dm-do-adapter (1.1.0)
+      data_objects (~> 0.10.2)
+      dm-core (~> 1.1.0)
+    dm-migrations (1.1.0)
+      dm-core (~> 1.1.0)
+    dm-postgres-adapter (1.1.0)
+      dm-do-adapter (~> 1.1.0)
+      do_postgres (~> 0.10.2)
+    dm-timestamps (1.1.0)
+      dm-core (~> 1.1.0)
+    dm-validations (1.1.0)
+      dm-core (~> 1.1.0)
+    do_postgres (0.10.3)
+      data_objects (= 0.10.3)
+    rack (1.2.2)
+    rdiscount (1.6.8)
+    sinatra (1.2.1)
+      rack (~> 1.1)
+      tilt (< 2.0, >= 1.2.2)
+    tilt (1.2.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  dm-core (= 1.1.0)
+  dm-migrations (= 1.1.0)
+  dm-postgres-adapter (= 1.1.0)
+  dm-timestamps (= 1.1.0)
+  dm-validations (= 1.1.0)
+  rdiscount (= 1.6.8)
+  sinatra (= 1.2.1)
