@@ -92,7 +92,7 @@ $(function() {
       var action = edit_form.attr("action");
 
       var change_back = function() {
-        console.log(action);
+        // console.log(action);
         edit_form.attr("action", action);
         edit_form.attr("target", "");
       };
@@ -104,49 +104,117 @@ $(function() {
     });
     
     // make it possible to tab in the edit textarea
+    var keys_we_care_about = function(event) {
+      return event.which == 9 ||
+             (event.which == 221 && event.metaKey) ||
+             (event.which == 219 && event.metaKey) ||
+             event.which == 13;
+    }
+
     $("#page_body").keydown(function(event) {
       // console.log(event.which, event.metaKey);
-      if (event.which == 9 || (event.which == 221 && event.metaKey)) {
+      if (keys_we_care_about(event)) {
         event.preventDefault();
-        var starting_pos, ending_pos, new_value;
+        var starting_pos, ending_pos, new_value = this.value, pieces = [], this_line = "", lines = [], spaces = "  ",
+            is_selection = this.selectionStart != this.selectionEnd;
 
-        if (this.selectionStart == this.selectionEnd) {
+        if (!is_selection) {
 
           var first_half = this.value.substring(0, this.selectionStart);
-          var second_half = this.value.split(first_half)[1] || "";
-          var lines = first_half.split("\n");
-          var last_line = lines[lines.length-1];
-          var spaces = last_line.length % 2 ? " " : "  ";
-
-          starting_pos = ending_pos = this.selectionStart + spaces.length;
-          new_value = first_half + spaces + second_half;
+          var second_half = this.value.substring(this.selectionEnd, this.value.length);
+          pieces = [first_half, second_half];
+          var lines = pieces[0].split("\n");
+          this_line = lines[lines.length-1];
 
         } else {
 
           var first_third = this.value.substring(0, this.selectionStart);
           var second_third = this.value.substring(this.selectionStart, this.selectionEnd);
-          var third_third = this.value.split(first_third + second_third)[1] || "";
+          var third_third = this.value.substring(this.selectionEnd, this.value.length);
+          pieces = [first_third, second_third, third_third];
 
-          var lines = first_third.split("\n");     // break into lines
-          var last_line = lines.pop() || "";       // grab the last one so we can put it into the middle
-          first_third = lines.join("\n");          // join them back together
+          lines = pieces[0].split("\n");     // break into lines
+          this_line = lines.pop() || "";       // grab the last one so we can put it into the middle
+          pieces[0] = lines.join("\n");          // join them back together
 
-          second_third = last_line + second_third; // put that line over into the second one
+          pieces[1] = this_line + pieces[1]; // put that line over into the second one
+        }
 
-          // get ready to add spaces to the front of all the lines
-          var lines2 = second_third.split("\n"); // get the lines
-          var new_second_third_lines = []; // start an accumulator
+        // tab or command + ]
+        if (event.which == 9 || (event.which == 221 && event.metaKey)) {
 
-          for (var i = 0; i < lines2.length; i++) {
-            new_second_third_lines.push("  "  + lines2[i]);
-          };
+          if (!is_selection) {
+
+            spaces = this_line.length % 2 ? " " : "  ";
+            starting_pos = ending_pos = this.selectionStart + spaces.length;
+            new_value = pieces.join(spaces);
+
+          } else {
+
+            // get ready to add spaces to the front of all the lines in the
+            // selection
+            var lines_to_indent = pieces[1].split("\n"); // get the lines
+            var indented_lines = []; // start an accumulator
+
+            for (var i = 0; i < lines_to_indent.length; i++) {
+              indented_lines.push("  "  + lines_to_indent[i]);
+            };
+
+            // recombine
+            new_value = pieces[0] + "\n" + indented_lines.join("\n") + pieces[2];
+            // reset the selection based on the number of lines
+            starting_pos = this.selectionStart + 2;
+            ending_pos = this.selectionEnd + (lines_to_indent.length * 2);
+
+          }
+
+        }
+
+        // return
+        if (event.which == 13) {
+
+          // console.log(this_line);
+
+          if (!is_selection) {
+
+            var spaces_at_the_beginnig_of_line = this_line.match(/^( *).*$/)[1];
+            pieces[1] = spaces_at_the_beginnig_of_line + pieces[1];
+            new_value = pieces.join("\n");
+            var amount = spaces_at_the_beginnig_of_line.length + 1;
+            starting_pos = this.selectionStart + amount;
+            ending_pos = this.selectionEnd + amount;
+
+          } else {
+
+            pieces[0] += this_line;
+            pieces[1] = "\n";
+            new_value = pieces.join("");
+            var amount = this_line == "" ? 0 : 1;
+            starting_pos = ending_pos = this.selectionStart + amount;
+
+          }
+
+        }
+
+        // command + [
+        if (event.which == 219 && event.metaKey) {
+          var lines_to_outdent = pieces[1].split("\n");
+          var outdented_lines = [];
+
+          for (var i = 0; i < lines_to_outdent.length; i++) {
+            outdented_lines.push(lines_to_outdent[i].replace(/^( {1,2})/, ""));
+          }
 
           // recombine
-          new_value = first_third + "\n" + new_second_third_lines.join("\n") + third_third;
+          new_value = pieces[0] + "\n" + outdented_lines.join("\n") + pieces[2];
           // reset the selection based on the number of lines
-          starting_pos = this.selectionStart + 2;
-          ending_pos = this.selectionEnd + (lines2.length * 2);
+          var number_of_spaces = outdented_lines[0].match(/^( *).*$/)[1].length;
+          var amount = number_of_spaces < 2 ? number_of_spaces : 2;
+          starting_pos = this.selectionStart - amount;
+          ending_pos = this.selectionEnd - (lines_to_outdent.length * 2) + 1;
         }
+
+        // console.log(pieces);
 
         this.value = new_value;
         this.setSelectionRange(starting_pos, ending_pos);
