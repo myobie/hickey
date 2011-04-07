@@ -249,3 +249,10 @@ hr.delete {
 #content.diff pre {
   white-space: pre-wrap;
 }
+
+/* =Export */
+
+#export,
+#export form {
+  display: inline;
+}

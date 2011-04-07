@@ -344,7 +344,14 @@ class Hickey < Sinatra::Base
     message "This is not saved yet, this is only a preview."
     haml :preview
   end
-  
+
+  require 'zip_file_wrapper'
+  post "/export.zip" do
+    ZipFileWrapper.new(Page.all) do |zipfile|
+      send_file(zipfile.file, :disposition => 'attachment', :filename => zipfile.zip_filename)
+    end
+  end
+
   get "*" do
     repository do
       @slug = params["splat"].join("/")
@@ -434,6 +441,10 @@ __END__
   %li
     %a(href="/pages/#{@page.id}/edit") Edit this page
   %li= "Last edited by #{h @page.editor_name}"
+  %li
+    #export
+      %form(action="/export.zip" method="post")
+        %button(type="submit") Export all pages
   %li.version
     %select#versions
       - @pages.each do |page|
