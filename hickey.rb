@@ -398,6 +398,9 @@ __END__
           %button(type="submit") Search
     = partial :message
     = yield
+    #export
+      %form(action="/export.zip" method="post")
+        %button(type="submit") Export all pages
     %script(src="/jquery.min.js")
     %script(src="/application.js")
 
@@ -441,10 +444,6 @@ __END__
   %li
     %a(href="/pages/#{@page.id}/edit") Edit this page
   %li= "Last edited by #{h @page.editor_name}"
-  %li
-    #export
-      %form(action="/export.zip" method="post")
-        %button(type="submit") Export all pages
   %li.version
     %select#versions
       - @pages.each do |page|

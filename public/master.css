@@ -252,7 +252,8 @@ hr.delete {
 
 /* =Export */
 
-#export,
-#export form {
-  display: inline;
+#export {
+  border-top: 1px solid #eee;
+  padding: 10px 20px;
+  text-align: right;
 }

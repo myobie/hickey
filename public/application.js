@@ -242,7 +242,7 @@ $(function() {
   $("#content.preview + #meta p").html('<a href="#" onclick="window.close()">Close this window</a>');
 
   // Export show and hide
-  $("#export").prepend('<a href="#" onclick="$(\'#export form\').show(); $(this).hide(); return false">Export all</a>');
+  $("#export").prepend('<a href="#" onclick="$(\'#export form\').show(); $(this).hide(); return false">Export</a>');
   $("#export form").hide();
 
 });
