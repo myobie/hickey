@@ -92,6 +92,10 @@ class Page
       false
     end
   end
+
+  def etag
+    Digest::SHA1.hexdigest("#{id}-#{version}-#{slug}-#{created_at}")
+  end
   
 protected
   def render_body
@@ -367,6 +371,8 @@ class Hickey < Sinatra::Base
           throw :halt, [404, haml(:not_found)]
         end
       end
+
+      etag @page.etag
     
       @pages = Page.all_for_slug(@slug)
     
